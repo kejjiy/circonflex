@@ -1,5 +1,5 @@
+import streamlit as st
 import plotly.graph_objects as go
-import webbrowser
 
 # Données de l'arbre avec les nouvelles sous-catégories et leurs valeurs
 tree = {
@@ -67,12 +67,11 @@ def prepare_data(tree, parent_label, parent_color):
         else:
             color = parent_color
 
-        colors.append(color)
-
         if isinstance(value, dict):
             # Calculer la somme des valeurs des enfants pour le nœud parent
             total_value = sum(value.values())
             values.append(total_value)
+            colors.append(color)
             prepare_data(value, label, color)
         else:
             # Ajouter la valeur du sous-thème
@@ -80,7 +79,7 @@ def prepare_data(tree, parent_label, parent_color):
             # Éclaircir la couleur pour les sous-thèmes
             amount = 0.5  # Vous pouvez ajuster cet éclaircissement si nécessaire
             subtheme_color = lighten_color(color, amount)
-            colors[-1] = subtheme_color  # Remplacer la couleur par la couleur éclaircie
+            colors.append(subtheme_color)
 
 # Ajouter le nœud racine
 root_label = "<b>Thèmes</b>"
@@ -135,8 +134,8 @@ fig.update_traces(
     )
 )
 
-# Enregistrer le graphique dans un fichier HTML
-fig.write_html("arbre_des_themes.html")
+# Afficher le graphique dans Streamlit
+st.set_page_config(page_title="Arbre des Thèmes", page_icon="🌳", layout="wide", initial_sidebar_state="collapsed")
 
-# Ouvrir le fichier HTML dans le navigateur par défaut
-webbrowser.open("arbre_des_themes.html")
+st.title("Arbre des Thèmes")
+st.plotly_chart(fig, use_container_width=True)
